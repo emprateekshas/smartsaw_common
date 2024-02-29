@@ -38,7 +38,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.28.1/cmake-3.28.1
 && make install \ 
 && cd .. \ 
 && rm -rf cmake-3.28.1.* \ 
-#&& ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake \ 
+&& ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake \ 
 && cmake --version 
 # Set CMake variables for cross-compilation 
 #ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja \ 
