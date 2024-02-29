@@ -1,0 +1,43 @@
+FROM ubuntu:latest AS base 
+# Install dependencies 
+RUN apt-get update \ 
+&& apt-get install -y \ 
+       apt-utils \ 
+       build-essential \ 
+       autoconf-archive \ 
+       git \ 
+       tar \ 
+       curl \ 
+       pkg-config \ 
+       zip \ 
+       unzip \ 
+       wget \ 
+       libssl-dev \ 
+&& rm -rf /var/lib/apt/lists/* \ 
+&& apt-get clean 
+WORKDIR /tmp/packages 
+# Install cmake latest version 
+RUN wget https://cmake.org/files/v3.28/cmake-3.28.1.tar.gz \ 
+&& tar -xzvf cmake-3.28.1.tar.gz \ 
+&& cd cmake-3.28.1 \ 
+&& ./bootstrap \ 
+&& make \ 
+&& make install \ 
+&& cd .. \ 
+&& rm -rf cmake-3.28.1* \ 
+&&  cmake --version 
+# Setting environment variable for vcpkg path 
+ENV HOME /tmp/packages   
+# Install vcpkg 
+RUN git clone https://github.com/Microsoft/vcpkg.git \ 
+&& ./vcpkg/bootstrap-vcpkg.sh 
+# Install project dependencies	 
+RUN cd vcpkg \ 
+&& ./vcpkg install openssl:x64-linux \ 
+	boost:x64-linux \ 
+	rapidjson:x64-linux \ 
+	antlr4:x64-linux \ 
+	gtest:x64-linux \ 
+	mongo-cxx-driver:x64-linux \ 
+	yaml-cpp:x64-linux \ 
+	date:x64-linux 	

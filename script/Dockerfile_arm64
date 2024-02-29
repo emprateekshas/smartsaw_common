@@ -1,0 +1,72 @@
+FROM ubuntu:latest AS base 
+# Install initial dependency packages 
+RUN apt-get update \ 
+&& apt-get install -y \ 
+        apt-utils \ 
+        build-essential \ 
+        autoconf-archive \ 
+        git \ 
+        curl \ 
+        zip \ 
+        unzip \ 
+        tar \ 
+        pkg-config \ 
+        wget \ 
+        libssl-dev \ 
+#        ninja-build \ 
+#        automake \ 
+#        autoconf \ 
+        qemu-user-static \ 
+&& echo "Install Successful using apt-get!!!" \ 
+&& rm -rf /var/lib/apt/lists/* \ 
+&& apt-get clean 
+# Install cross-compilation toolchain for ARM64 
+RUN apt-get update \ 
+&& apt-get install -y \ 
+        gcc-aarch64-linux-gnu \ 
+        g++-aarch64-linux-gnu \ 
+        libc-dev-arm64-cross \ 
+&& rm -rf /var/lib/apt/lists/* \ 
+&& apt-get clean 
+# Set up CMake 
+WORKDIR /tmp/packages 
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.28.1/cmake-3.28.1.tar.gz \ 
+&& tar -xzvf cmake-3.28.1.tar.gz \ 
+&& cd cmake-3.28.1 \ 
+&& ./bootstrap --prefix=/opt/cmake -- -DCMAKE_USE_OPENSSL=OFF \ 
+&& make \ 
+&& make install \ 
+&& cd .. \ 
+&& rm -rf cmake-3.28.1.* \ 
+#&& ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake \ 
+&& cmake --version 
+# Set CMake variables for cross-compilation 
+#ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja \ 
+#    CC=aarch64-linux-gnu-gcc \ 
+#    CXX=aarch64-linux-gnu-g++ 
+#ENV VCPKG_FORCE_SYSTEM_BINARIES=1 
+# Clone vcpkg repository and bootstrap vcpkg 
+RUN git clone https://github.com/Microsoft/vcpkg.git \ 
+&& cd vcpkg \ 
+&& ./bootstrap-vcpkg.sh \ 
+&& ./vcpkg update 
+WORKDIR /tmp/packages/vcpkg 
+# Install Dependencies through vcpkg 
+ENV VCPKG_DEFAULT_TRIPLET=arm64-linux 
+RUN ./vcpkg install openssl:$VCPKG_DEFAULT_TRIPLET \ 
+    antlr4:$VCPKG_DEFAULT_TRIPLET \ 
+    rapidjson:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-beast:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-filesystem:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-asio:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-variant:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-functional:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-range:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-format:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-bind:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-date-time:$VCPKG_DEFAULT_TRIPLET \ 
+    boost-algorithm:$VCPKG_DEFAULT_TRIPLET \ 
+    gtest:$VCPKG_DEFAULT_TRIPLET \ 
+    mongo-cxx-driver:$VCPKG_DEFAULT_TRIPLET \ 
+    yaml-cpp:$VCPKG_DEFAULT_TRIPLET \ 
+    date:$VCPKG_DEFAULT_TRIPLET 
