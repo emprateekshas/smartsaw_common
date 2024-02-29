@@ -23,14 +23,14 @@ jobs:
         run: | 
           echo "VERSION=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV 
           echo "MAJOR_VERSION=$(echo ${{ github.ref_name }} | sed -E 's/^([0-9]+)\.([0-9]+)\..+/\1.\2/')" >> $GITHUB_ENV 
-      - name: Build and push Docker images (amd64) 
-        uses: docker/build-push-action@v5 
-        with: 
-          context: . 
-          file: script/Dockerfile_amd64 
-          platforms: linux/amd64 
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/smartsaw_docker_base_ubuntu_22.04:amd64 
-          push: true 
+#      - name: Build and push Docker images (amd64) 
+#        uses: docker/build-push-action@v5 
+#        with: 
+#          context: . 
+#          file: script/Dockerfile_amd64 
+#          platforms: linux/amd64 
+#          tags: ${{ secrets.DOCKERHUB_USERNAME }}/smartsaw_docker_base_ubuntu_22.04:amd64 
+#          push: true 
       - name: Build and push Docker images (arm64) 
         uses: docker/build-push-action@v5 
         with: 
