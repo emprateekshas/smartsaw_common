@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v5 
         with: 
           context: . 
-          file: scripts/Dockerfile_amd64 
+          file: script/Dockerfile_amd64 
           platforms: linux/amd64 
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/smartsaw_docker_base_ubuntu_22.04:amd64 
           push: true 
@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v5 
         with: 
           context: . 
-          file: scripts/Dockerfile_arm64 
+          file: script/Dockerfile_arm64 
           platforms: linux/arm64 
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/smartsaw_docker_base_ubuntu_22.04:arm64 
           push: true 
